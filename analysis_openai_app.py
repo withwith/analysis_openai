@@ -10,6 +10,15 @@ st.set_page_config(
     layout="wide"
 )
 
+# 로고 이미지 (base64로 인코딩된 간단한 막대 그래프 SVG)
+LOGO = """
+    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="20" width="6" height="15" fill="#00ff00"/>
+        <rect x="17" y="10" width="6" height="25" fill="#ff00ff"/>
+        <rect x="29" y="15" width="6" height="20" fill="#00ffff"/>
+    </svg>
+"""
+
 # CSS 스타일 - 다크 모드 대응
 st.markdown("""
     <style>
@@ -47,21 +56,32 @@ st.markdown("""
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
+        gap: 15px;
         margin-bottom: 1rem;
+        padding: 1rem;
+        background-color: var(--background-color);
+        border-radius: 10px;
     }
-    .logo {
-        width: 40px;
-        height: 40px;
+    .logo-container {
+        display: flex;
+        align-items: center;
+    }
+    .title-text {
+        color: var(--text-color);
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0;
     }
     </style>
 """, unsafe_allow_html=True)
 
 # 헤더 (로고 + 텍스트)
-st.markdown("""
+st.markdown(f"""
     <div class="title-with-logo">
-        <img src="https://raw.githubusercontent.com/streamlit/brand-assets/main/streamlit-mark-color.png" alt="Logo" class="logo">
-        <h1>OpenAI Text Analyzer</h1>
+        <div class="logo-container">
+            {LOGO}
+        </div>
+        <h1 class="title-text">OpenAI Text Analyzer</h1>
     </div>
 """, unsafe_allow_html=True)
 
