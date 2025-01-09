@@ -71,7 +71,8 @@ def get_webpage_content(url):
 def analyze_text(api_key_value, text):
     """텍스트 분석 함수"""
     try:
-        client = openai.OpenAI(api_key=api_key_value)
+        # OpenAI API 키 설정
+        openai.api_key = api_key_value
         
         prompt = """
         다음 내용을 분석하여 아래 형식으로 정리해주세요. 각 섹션과 항목에는 적절한 이모지를 추가해주세요:
@@ -88,7 +89,7 @@ def analyze_text(api_key_value, text):
         분석할 내용:
         """
 
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-4-0125-preview",  # GPT-4O-mini 모델
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that analyzes text and provides structured summaries."},
