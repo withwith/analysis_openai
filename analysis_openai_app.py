@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# CSS 스타일
+# CSS 스타일 - 다크 모드 대응
 st.markdown("""
     <style>
     .stTextInput > div > div > input {
@@ -22,22 +22,48 @@ st.markdown("""
     .main-header {
         text-align: center;
         padding: 1rem;
-        background-color: #f8f9fa;
+        background-color: var(--background-color);
         border-radius: 10px;
         margin-bottom: 2rem;
+        color: var(--text-color);
+    }
+    [data-testid="stAppViewContainer"] {
+        --background-color: #f8f9fa;
+        --text-color: #31333F;
+    }
+    [data-testid="stAppViewContainer"][data-theme="dark"] {
+        --background-color: #262730;
+        --text-color: #FFFFFF;
     }
     .result-container {
-        background-color: #f8f9fa;
+        background-color: var(--background-color);
         padding: 20px;
         border-radius: 10px;
         line-height: 1.6;
         margin-top: 2rem;
+        color: var(--text-color);
+    }
+    .title-with-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 1rem;
+    }
+    .logo {
+        width: 40px;
+        height: 40px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 헤더
-st.markdown("<h1 class='main-header'>📊 OpenAI Text Analyzer</h1>", unsafe_allow_html=True)
+# 헤더 (로고 + 텍스트)
+st.markdown("""
+    <div class="title-with-logo">
+        <img src="https://raw.githubusercontent.com/streamlit/brand-assets/main/streamlit-mark-color.png" alt="Logo" class="logo">
+        <h1>OpenAI Text Analyzer</h1>
+    </div>
+""", unsafe_allow_html=True)
 
 # 사이드바 - API 설정
 with st.sidebar:
@@ -121,7 +147,7 @@ if st.button("분석 시작", type="primary"):
             if result:
                 st.markdown(
                     f"""<div class='result-container'>
-                        <h2 style='color: #1a73e8; text-align: center;'>📊 분석 결과 📊</h2>
+                        <h2 style='color: var(--text-color); text-align: center;'>📊 분석 결과 📊</h2>
                         <div style='white-space: pre-wrap; margin-top: 20px;'>
                         {result.replace('•', '◾').replace('*', '★')}
                         </div>
@@ -132,7 +158,7 @@ if st.button("분석 시작", type="primary"):
 # 푸터
 st.markdown("---")
 st.markdown("""
-    <div style='text-align: center; color: #666;'>
+    <div style='text-align: center; color: var(--text-color);'>
         <p>Created with ❤️ using Streamlit and OpenAI</p>
     </div>
 """, unsafe_allow_html=True)
