@@ -11,12 +11,15 @@ st.set_page_config(
 )
 
 # 로고 이미지 (base64로 인코딩된 간단한 막대 그래프 SVG)
-LOGO = """
-    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-        <rect x="5" y="20" width="6" height="15" fill="#00ff00"/>
-        <rect x="17" y="10" width="6" height="25" fill="#ff00ff"/>
-        <rect x="29" y="15" width="6" height="20" fill="#00ffff"/>
-    </svg>
+logo_html = """
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="20" width="6" height="15" fill="#00ff00"/>
+            <rect x="17" y="10" width="6" height="25" fill="#ff00ff"/>
+            <rect x="29" y="15" width="6" height="20" fill="#00ffff"/>
+        </svg>
+        <h1 style="margin: 0; color: var(--text-color);">OpenAI Text Analyzer</h1>
+    </div>
 """
 
 # CSS 스타일 - 다크 모드 대응
@@ -27,14 +30,6 @@ st.markdown("""
     }
     .stTextArea > div > div > textarea {
         height: 150px;
-    }
-    .main-header {
-        text-align: center;
-        padding: 1rem;
-        background-color: var(--background-color);
-        border-radius: 10px;
-        margin-bottom: 2rem;
-        color: var(--text-color);
     }
     [data-testid="stAppViewContainer"] {
         --background-color: #f8f9fa;
@@ -52,38 +47,11 @@ st.markdown("""
         margin-top: 2rem;
         color: var(--text-color);
     }
-    .title-with-logo {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        margin-bottom: 1rem;
-        padding: 1rem;
-        background-color: var(--background-color);
-        border-radius: 10px;
-    }
-    .logo-container {
-        display: flex;
-        align-items: center;
-    }
-    .title-text {
-        color: var(--text-color);
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin: 0;
-    }
     </style>
 """, unsafe_allow_html=True)
 
-# 헤더 (로고 + 텍스트)
-st.markdown(f"""
-    <div class="title-with-logo">
-        <div class="logo-container">
-            {LOGO}
-        </div>
-        <h1 class="title-text">OpenAI Text Analyzer</h1>
-    </div>
-""", unsafe_allow_html=True)
+# 헤더
+st.markdown(logo_html, unsafe_allow_html=True)
 
 # 사이드바 - API 설정
 with st.sidebar:
