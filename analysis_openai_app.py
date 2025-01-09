@@ -1,0 +1,137 @@
+import streamlit as st
+import openai
+import requests
+from bs4 import BeautifulSoup
+
+# 페이지 설정
+st.set_page_config(
+    page_title="OpenAI Text Analyzer",
+    page_icon="📊",
+    layout="wide"
+)
+
+# CSS 스타일
+st.markdown("""
+    <style>
+    .stTextInput > div > div > input {
+        height: 40px;
+    }
+    .stTextArea > div > div > textarea {
+        height: 150px;
+    }
+    .main-header {
+        text-align: center;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    .result-container {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        line-height: 1.6;
+        margin-top: 2rem;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# 헤더
+st.markdown("<h1 class='main-header'>📊 OpenAI Text Analyzer</h1>", unsafe_allow_html=True)
+
+# 사이드바 - API 설정
+with st.sidebar:
+    st.header("API 설정")
+    api_key = st.text_input("OpenAI API Key", type="password", key="api_key")
+    st.info("API 키는 안전하게 보관되며, 세션이 종료되면 자동으로 삭제됩니다.")
+
+# 메인 영역
+input_type = st.radio("분석 방식 선택", ["URL", "Text"])
+input_text = st.text_area("분석할 내용을 입력하세요", height=150)
+
+def get_webpage_content(url):
+    """웹페이지 내용 가져오기"""
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124'
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+        for script in soup(["script", "style"]):
+            script.decompose()
+
+        text = soup.get_text(separator='\n', strip=True)
+        return text
+    except Exception as e:
+        st.error(f"웹페이지 가져오기 실패: {str(e)}")
+        return None
+
+def analyze_text(api_key_value, text):
+    """텍스트 분석 함수"""
+    try:
+        client = openai.OpenAI(api_key=api_key_value)
+        
+        prompt = """
+        다음 내용을 분석하여 아래 형식으로 정리해주세요. 각 섹션과 항목에는 적절한 이모지를 추가해주세요:
+
+        🎯 내용 요약 (핵심 포인트 5개):
+        • 각 포인트는 번호를 매기고, 명확하게 구분되도록 작성
+        • 각 포인트 앞에 관련 이모지 추가
+
+        💡 주요 키워드:
+        • 각 키워드와 설명을 별도 줄에 작성
+        • 키워드는 굵게 강조
+        • 각 키워드 앞에 관련 이모지 추가
+
+        분석할 내용:
+        """
+
+        response = client.chat.completions.create(
+            model="gpt-4-0125-preview",  # GPT-4O-mini 모델
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that analyzes text and provides structured summaries."},
+                {"role": "user", "content": f"{prompt}\n\n{text}"}
+            ]
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        st.error(f"분석 중 오류가 발생했습니다: {str(e)}")
+        return None
+
+if st.button("분석 시작", type="primary"):
+    if not api_key:
+        st.error("❌ API 키를 입력해주세요.")
+    elif not input_text:
+        st.error("❌ 분석할 내용을 입력해주세요.")
+    else:
+        with st.spinner("분석 중..."):
+            # URL인 경우 웹페이지 내용 가져오기
+            if input_type == "URL":
+                content = get_webpage_content(input_text)
+                if not content:
+                    st.stop()
+            else:
+                content = input_text
+
+            # 텍스트 분석
+            result = analyze_text(api_key, content)
+            if result:
+                st.markdown(
+                    f"""<div class='result-container'>
+                        <h2 style='color: #1a73e8; text-align: center;'>📊 분석 결과 📊</h2>
+                        <div style='white-space: pre-wrap; margin-top: 20px;'>
+                        {result.replace('•', '◾').replace('*', '★')}
+                        </div>
+                    </div>""",
+                    unsafe_allow_html=True
+                )
+
+# 푸터
+st.markdown("---")
+st.markdown("""
+    <div style='text-align: center; color: #666;'>
+        <p>Created with ❤️ using Streamlit and OpenAI</p>
+    </div>
+""", unsafe_allow_html=True)
